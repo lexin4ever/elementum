@@ -204,10 +204,11 @@ func UserlistMovies(ctx *gin.Context) {
 func UserlistShows(ctx *gin.Context) {
 	defer perf.ScopeTimer()()
 
+	user := ctx.Params.ByName("user")
 	listID := ctx.Params.ByName("listId")
 	pageParam := ctx.DefaultQuery("page", "1")
 	page, _ := strconv.Atoi(pageParam)
-	shows, err := trakt.ListItemsShows(listID, false)
+	shows, err := trakt.ListItemsShows(user, listID, false)
 	if err != nil {
 		xbmc.Notify("Elementum", err.Error(), config.AddonIcon())
 	}
