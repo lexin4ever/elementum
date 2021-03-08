@@ -30,7 +30,7 @@ func checkRepository() bool {
 	}
 	log.Info("Elementum repository not installed, installing...")
 	xbmc.InstallAddon("repository.elementum")
-	for timeout := 0; timeout < 3; timeout++ {
+	for timeout := 0; timeout < 10; timeout++ {
 		if xbmc.IsAddonInstalled("repository.elementum") {
 			break
 		}

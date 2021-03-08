@@ -902,7 +902,7 @@ func CheckBurst() {
 		}
 	}
 
-	for timeout := 0; timeout < 5; timeout++ {
+	for timeout := 0; timeout < 10; timeout++ {
 		if xbmc.IsAddonInstalled("repository.elementum") {
 			break
 		}
