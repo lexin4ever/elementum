@@ -1151,9 +1151,11 @@ func (t *Torrent) Drop(removeFiles, removeData bool) {
 			defer util.FreeMemoryGC()
 		}
 
-		if t.lastStatus != nil && t.lastStatus.Swigcptr() != 0 {
-			lt.DeleteTorrentStatus(t.lastStatus)
-		}
+		// TODO: Somehow this drops a double free error, so like it was removed already
+		// if t.lastStatus != nil && t.lastStatus.Swigcptr() != 0 {
+		// 	lt.DeleteTorrentStatus(t.lastStatus)
+		//  t.lastStatus = nil
+		// }
 
 		toRemove := 0
 		if removeData && !t.IsMemoryStorage() {
@@ -2097,6 +2099,7 @@ func (t *Torrent) GetLastStatus(isForced bool) lt.TorrentStatus {
 
 	if t.lastStatus != nil && t.lastStatus.Swigcptr() != 0 {
 		lt.DeleteTorrentStatus(t.lastStatus)
+		t.lastStatus = nil
 	}
 
 	t.lastStatus = t.GetStatus()
