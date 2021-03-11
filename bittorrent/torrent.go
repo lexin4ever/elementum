@@ -2247,6 +2247,19 @@ func (t *Torrent) GetOldTorrent() (*TorrentFile, error) {
 	return oldTorrent, nil
 }
 
+// ResetBuffering resets all fields related to buffering
+func (t *Torrent) ResetBuffering() {
+	t.IsBuffering = false
+	t.IsBufferingFinished = false
+	t.BufferLength = 0
+	t.BufferProgress = 0
+	t.BufferProgressPrevious = 0
+	t.BufferPiecesLength = 0
+
+	t.BufferPiecesProgress = map[int]float64{}
+	t.BufferProgress = -1
+}
+
 func peerNumToString(num int) string {
 	if num <= 0 {
 		return "-"

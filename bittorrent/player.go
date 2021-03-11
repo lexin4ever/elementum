@@ -561,6 +561,7 @@ func (btp *Player) bufferDialog() {
 				errMsg := "User cancelled the buffering"
 				log.Info(errMsg)
 				btp.bufferEvents.Broadcast(errors.New(errMsg))
+				btp.t.ResetBuffering()
 				return
 			}
 		case <-oneSecond.C:
