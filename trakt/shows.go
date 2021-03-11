@@ -524,8 +524,12 @@ func PreviousCollectionShows() (shows []*Shows, err error) {
 }
 
 // ListItemsShows ...
-func ListItemsShows(listID string, isUpdateNeeded bool) (shows []*Shows, err error) {
-	endPoint := fmt.Sprintf("users/%s/lists/%s/items/shows", config.Get().TraktUsername, listID)
+func ListItemsShows(user string, listID string, isUpdateNeeded bool) (shows []*Shows, err error) {
+	if user == "" || user == "id" {
+		user = config.Get().TraktUsername
+	}
+
+	endPoint := fmt.Sprintf("users/%s/lists/%s/items/shows", user, listID)
 
 	params := napping.Params{}.AsUrlValues()
 

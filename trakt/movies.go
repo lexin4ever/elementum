@@ -402,7 +402,7 @@ func Likedlists() (lists []*List) {
 		xbmc.Notify("Elementum", "LOCALIZE[30149]", config.AddonIcon())
 		return lists
 	}
-	endPoint := "users/likes"
+	endPoint := "users/likes/lists"
 	params := napping.Params{}.AsUrlValues()
 
 	var resp *napping.Response

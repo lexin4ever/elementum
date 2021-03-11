@@ -88,9 +88,9 @@ func MoviesIndex(ctx *gin.Context) {
 		{Label: "LOCALIZE[30517]", Path: URLForXBMC("/movies/library"), Thumbnail: config.AddonResource("img", "movies.png")},
 	}
 	for _, item := range items {
-		item.ContextMenu = [][]string{
+		item.ContextMenu = append([][]string{
 			{"LOCALIZE[30142]", fmt.Sprintf("XBMC.RunPlugin(%s)", URLForXBMC("/setviewmode/menus_movies"))},
-		}
+		}, item.ContextMenu...)
 	}
 
 	// Adding items from custom menu

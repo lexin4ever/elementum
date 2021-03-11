@@ -1180,7 +1180,7 @@ func SyncShowsList(listID string, updating bool, isUpdateNeeded bool) (err error
 		label = "LOCALIZE[30257]"
 	default:
 		previous, _ = trakt.PreviousListItemsShows(listID)
-		current, _ = trakt.ListItemsShows(listID, isUpdateNeeded)
+		current, _ = trakt.ListItemsShows("", listID, isUpdateNeeded)
 
 		label = "LOCALIZE[30263]"
 	}

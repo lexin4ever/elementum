@@ -59,9 +59,9 @@ func TVIndex(ctx *gin.Context) {
 		{Label: "LOCALIZE[30517]", Path: URLForXBMC("/shows/library"), Thumbnail: config.AddonResource("img", "genre_tv.png")},
 	}
 	for _, item := range items {
-		item.ContextMenu = [][]string{
+		item.ContextMenu = append([][]string{
 			{"LOCALIZE[30143]", fmt.Sprintf("XBMC.RunPlugin(%s)", URLForXBMC("/setviewmode/menus_tvshows"))},
-		}
+		}, item.ContextMenu...)
 	}
 
 	// Adding items from custom menu
