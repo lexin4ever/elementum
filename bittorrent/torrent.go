@@ -30,6 +30,7 @@ import (
 	"github.com/elgatito/elementum/config"
 	"github.com/elgatito/elementum/database"
 	"github.com/elgatito/elementum/tmdb"
+	"github.com/elgatito/elementum/tvdb"
 	"github.com/elgatito/elementum/util"
 	"github.com/elgatito/elementum/xbmc"
 )
@@ -1847,7 +1848,7 @@ func (t *Torrent) SelectDownloadFiles(btp *Player) {
 		for _, f := range files {
 			t.DownloadFile(f)
 		}
-		
+
 		t.SaveDBFiles()
 	}
 }
