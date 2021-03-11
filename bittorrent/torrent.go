@@ -994,8 +994,8 @@ func (t *Torrent) SaveDBFiles() {
 	t.FetchDBItem()
 }
 
-// DownloadFile ...
-func (t *Torrent) DownloadFile(addFile *File) {
+// DownloadFileWithPriority ...
+func (t *Torrent) DownloadFileWithPriority(addFile *File, priority int) {
 	addFile.Selected = true
 
 	idx := -1
@@ -1020,11 +1020,16 @@ func (t *Torrent) DownloadFile(addFile *File) {
 		}
 
 		log.Debugf("Choosing file for download: %s", f.Path)
-		t.th.FilePriority(f.Index, 1)
+		t.th.FilePriority(f.Index, priority)
 
 		// Need to sleep because file_priority is executed async
 		time.Sleep(50 * time.Millisecond)
 	}
+}
+
+// DownloadFile ...
+func (t *Torrent) DownloadFile(addFile *File) {
+	t.DownloadFileWithPriority(addFile, 1)
 }
 
 // UnDownloadFile ...
