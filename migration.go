@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/elgatito/elementum/repository"
 	"github.com/elgatito/elementum/xbmc"
 )
@@ -28,6 +30,13 @@ func checkRepository() bool {
 	}
 	log.Info("Elementum repository not installed, installing...")
 	xbmc.InstallAddon("repository.elementum")
+	for timeout := 0; timeout < 10; timeout++ {
+		if xbmc.IsAddonInstalled("repository.elementum") {
+			break
+		}
+		log.Info("Sleeping 1 second while waiting for Elementum repository add-on to be installed")
+		time.Sleep(1 * time.Second)
+	}
 	xbmc.SetAddonEnabled("repository.elementum", true)
 	xbmc.UpdateLocalAddons()
 	xbmc.UpdateAddonRepos()

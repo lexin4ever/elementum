@@ -896,21 +896,35 @@ func CheckBurst() {
 	// Check for enabled providers and Elementum Burst
 	for _, addon := range xbmc.GetAddons("xbmc.python.script", "executable", "all", []string{"name", "version", "enabled"}).Addons {
 		if strings.HasPrefix(addon.ID, "script.elementum.") {
-			if addon.Enabled == true {
+			if addon.Enabled {
 				return
 			}
 		}
 	}
 
-	time.Sleep(5 * time.Second)
+	for timeout := 0; timeout < 10; timeout++ {
+		if xbmc.IsAddonInstalled("repository.elementum") {
+			break
+		}
+		log.Info("Sleeping 1 second while waiting for Elementum repository add-on to be installed")
+		time.Sleep(1 * time.Second)
+	}
+
 	log.Info("Updating Kodi add-on repositories for Burst...")
 	xbmc.UpdateLocalAddons()
 	xbmc.UpdateAddonRepos()
 
 	if !Get().SkipBurstSearch && xbmc.DialogConfirmFocused("Elementum", "LOCALIZE[30271]") {
 		log.Infof("Triggering Kodi to check for script.elementum.burst plugin")
-		xbmc.PlayURL("plugin://script.elementum.burst/")
-		time.Sleep(15 * time.Second)
+		xbmc.InstallAddon("script.elementum.burst")
+
+		for timeout := 0; timeout < 15; timeout++ {
+			if xbmc.IsAddonInstalled("script.elementum.burst") {
+				break
+			}
+			log.Info("Sleeping 1 second while waiting for script.elementum.burst add-on to be installed")
+			time.Sleep(1 * time.Second)
+		}
 
 		log.Infof("Checking for existence of script.elementum.burst plugin now")
 		if xbmc.IsAddonInstalled("script.elementum.burst") {
