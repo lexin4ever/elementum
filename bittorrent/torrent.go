@@ -1788,6 +1788,70 @@ func (t *Torrent) GetCandidateFiles(btp *Player) ([]*CandidateFile, int, error) 
 	return nil, biggestFile, nil
 }
 
+// SelectDownloadFiles selects files for download, according to setting
+func (t *Torrent) SelectDownloadFiles(btp *Player) {
+	strategy := config.Get().DownloadFileStrategy
+
+	if strategy == DownloadFilePlaying || t.IsMemoryStorage() {
+		return
+	}
+
+	files := t.files
+	choices, _, err := t.GetCandidateFiles(btp)
+	if err != nil {
+		return
+	}
+
+	if strategy == DownloadFileSeason {
+		if btp == nil || btp.p.Season <= 0 {
+			return
+		}
+
+		show := tmdb.GetShow(btp.p.ShowID, config.Get().Language)
+		if show == nil {
+			return
+		}
+
+		var tvdbShow *tvdb.Show
+		// If show is Anime, we will need Tvdb Show entry for getting absolute numbers for episodes
+		if show.IsAnime() {
+			tvdbID := util.StrInterfaceToInt(show.ExternalIDs.TVDBID)
+			tvdbShow, _ = tvdb.GetShow(tvdbID, config.Get().Language)
+		}
+
+		for _, season := range show.Seasons {
+			if season == nil || season.EpisodeCount == 0 || season.Season != btp.p.Season {
+				continue
+			}
+			tmdbSeason := tmdb.GetSeason(btp.p.ShowID, season.Season, config.Get().Language, len(show.Seasons))
+			if tmdbSeason == nil {
+				continue
+			}
+
+			episodes := tmdbSeason.Episodes
+
+			for _, episode := range episodes {
+				if episode == nil {
+					continue
+				}
+
+				index, found := MatchEpisodeFilename(season.Season, episode.EpisodeNumber, len(show.Seasons) == 1, btp.p.Season, show, episode, tvdbShow, choices)
+				if index >= 0 && found == 1 {
+					t.DownloadFile(files[choices[index].Index])
+				}
+			}
+		}
+
+		t.SaveDBFiles()
+	} else if strategy == DownloadFileAll {
+		for _, f := range files {
+			t.DownloadFile(f)
+		}
+		
+		t.SaveDBFiles()
+	}
+}
+
 // ChooseFile opens file selector if not provided with Player, otherwise tries to detect what to open.
 func (t *Torrent) ChooseFile(btp *Player) (*File, int, error) {
 	// Checking if we need to open specific file from torrent file.

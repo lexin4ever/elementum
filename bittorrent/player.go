@@ -245,6 +245,12 @@ func (btp *Player) Buffer() error {
 		}
 	}
 
+	// If needed select more files for download
+	if config.Get().DownloadFileStrategy != DownloadFilePlaying &&
+		!btp.t.IsMemoryStorage() {
+		go btp.t.SelectDownloadFiles(btp)
+	}
+
 	go btp.processMetadata()
 
 	if btp.p.Background {

@@ -56,6 +56,7 @@ type Configuration struct {
 	HomePath                   string
 	XbmcPath                   string
 	SpoofUserAgent             int
+	DownloadFileStrategy       int
 	KeepDownloading            int
 	KeepFilesPlaying           int
 	KeepFilesFinished          int
@@ -519,6 +520,7 @@ func Reload() *Configuration {
 		AutoloadTorrentsPaused:     settings["autoload_torrents_paused"].(bool),
 		SpoofUserAgent:             settings["spoof_user_agent"].(int),
 		LimitAfterBuffering:        settings["limit_after_buffering"].(bool),
+		DownloadFileStrategy:       settings["download_file_strategy"].(int),
 		KeepDownloading:            settings["keep_downloading"].(int),
 		KeepFilesPlaying:           settings["keep_files_playing"].(int),
 		KeepFilesFinished:          settings["keep_files_finished"].(int),

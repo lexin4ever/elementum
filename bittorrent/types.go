@@ -14,6 +14,15 @@ const (
 	StorageMemory
 )
 
+const (
+	// DownloadFilePlaying ...
+	DownloadFilePlaying int = iota
+	// DownloadFileSeason ...
+	DownloadFileSeason
+	// DownloadFileAll ...
+	DownloadFileAll
+)
+
 var (
 	// Storages ...
 	Storages = []string{
