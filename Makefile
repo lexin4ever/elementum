@@ -92,8 +92,8 @@ PLATFORMS = \
 	linux-x64 \
 	linux-x86 \
 	windows-x64 \
-	windows-x86 \
-	darwin-x64
+	windows-x86 #\
+	#darwin-x64
 
 .PHONY: $(PLATFORMS)
 
