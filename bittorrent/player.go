@@ -1412,6 +1412,10 @@ func contextPlayURL(f string, title string, forced bool) string {
 }
 
 func getShowSeasonEpisode(showID, seasonNumber, episodeNumber int) (*tmdb.Show, *tmdb.Season, *tmdb.Episode, error) {
+	if episodeNumber <= 0 {
+		return nil, nil, nil, errors.New("Wrong episode number")
+	}
+
 	show := tmdb.GetShow(showID, config.Get().Language)
 	if show == nil {
 		return nil, nil, nil, errors.New("Unable to find show")
