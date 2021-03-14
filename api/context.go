@@ -25,7 +25,7 @@ func ContextPlaySelector(s *bittorrent.Service) gin.HandlerFunc {
 		mediaAction := "forcelinks"
 		if media == "movie" && config.Get().ChooseStreamAutoMovie {
 			mediaAction = "forceplay"
-		} else if media == "episode" && config.Get().ChooseStreamAutoShow {
+		} else if (media == "episode" || media == "season") && config.Get().ChooseStreamAutoShow {
 			mediaAction = "forceplay"
 		} else if kodiID == 0 && config.Get().ChooseStreamAutoSearch {
 			mediaAction = "forceplay"
@@ -45,9 +45,15 @@ func ContextPlaySelector(s *bittorrent.Service) gin.HandlerFunc {
 				return
 			}
 		} else if media == "episode" {
-			if s, e := library.GetLibraryEpisode(kodiID); s != nil && e != nil && e.UIDs.TMDB != 0 {
+			if s, e := library.GetLibraryEpisode(kodiID); s != nil && e != nil && s.UIDs.TMDB != 0 {
 				title := fmt.Sprintf("%s S%02dE%02d", s.Title, e.Season, e.Episode)
 				ctx.Redirect(302, URLQuery(URLForXBMC("/show/%d/season/%d/episode/%d/%s/%s", s.UIDs.TMDB, e.Season, e.Episode, mediaAction, url.PathEscape(title))))
+				return
+			}
+		} else if media == "season" {
+			if s, se := library.GetLibrarySeason(kodiID); s != nil && se != nil && s.UIDs.TMDB != 0 {
+				title := fmt.Sprintf("%s S%02d", s.Title, se.Season)
+				ctx.Redirect(302, URLQuery(URLForXBMC("/show/%d/season/%d/%s/%s", s.UIDs.TMDB, se.Season, mediaAction, url.PathEscape(title))))
 				return
 			}
 		}
