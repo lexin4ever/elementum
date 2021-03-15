@@ -95,7 +95,7 @@ type PlayerParams struct {
 	DoneSubtitles     bool
 	Background        bool
 	KodiPosition      int
-	WatchedProgress   int
+	WatchedProgress   float64
 	WatchedTime       float64
 	VideoDuration     float64
 	URI               string
@@ -696,6 +696,9 @@ func (btp *Player) updateWatchTimes() {
 	}
 	btp.p.WatchedTime, _ = strconv.ParseFloat(ret["watchedTime"], 64)
 	btp.p.VideoDuration, _ = strconv.ParseFloat(ret["videoDuration"], 64)
+	if btp.p.VideoDuration > 0 {
+		btp.p.WatchedProgress = btp.p.WatchedTime / btp.p.VideoDuration * 100
+	}
 }
 
 func (btp *Player) playerLoop() {
@@ -797,8 +800,6 @@ playbackLoop:
 				}
 			}
 
-			btp.p.WatchedProgress = int(btp.p.WatchedTime / btp.p.VideoDuration * 100)
-
 			if btp.next.f != nil && !btp.next.started && btp.isReadyForNextFile() {
 				btp.startNextFile()
 			}
@@ -812,7 +813,11 @@ playbackLoop:
 		btp.GetIdent()
 		btp.UpdateWatched()
 		if btp.scrobble {
-			trakt.Scrobble("stop", btp.p.ContentType, btp.p.TMDBId, btp.p.WatchedTime, btp.p.VideoDuration)
+			if btp.IsWatched() {
+				trakt.Scrobble("stop", btp.p.ContentType, btp.p.TMDBId, btp.p.WatchedTime, btp.p.VideoDuration)
+			} else {
+				trakt.Scrobble("pause", btp.p.ContentType, btp.p.TMDBId, btp.p.WatchedTime, btp.p.VideoDuration)
+			}
 		}
 
 		btp.p.Playing = false
@@ -821,6 +826,7 @@ playbackLoop:
 		btp.p.WasPlaying = true
 		btp.p.WatchedTime = 0
 		btp.p.VideoDuration = 0
+		btp.p.WatchedProgress = 0
 	}()
 
 	if btp.overlayStatus != nil {
@@ -839,7 +845,7 @@ func (btp *Player) isReadyForNextFile() bool {
 		return ra > 0 && sum > 0 && ra > sum+btp.next.bufferSize && btp.t.awaitingPieces.IsEmpty() && btp.t.lastProgress > 90
 	}
 
-	return btp.p.WatchedProgress > config.Get().PlaybackPercent
+	return btp.IsWatched()
 }
 
 // Params returns Params for external use
@@ -851,18 +857,17 @@ func (btp *Player) Params() *PlayerParams {
 func (btp *Player) UpdateWatched() {
 	log.Debugf("Updating Watched state: %s", litter.Sdump(btp.p))
 
-	if btp.p.VideoDuration == 0 || btp.p.WatchedTime == 0 {
+	if btp.p.WatchedProgress == 0 {
 		return
 	}
 
-	progress := btp.p.WatchedTime / btp.p.VideoDuration * 100
-
-	log.Infof("Currently at %f%%, KodiID: %d", progress, btp.p.KodiID)
+	log.Infof("Currently at %f%%, KodiID: %d", btp.p.WatchedProgress, btp.p.KodiID)
 
 	// Update Watched state for current file
-	SetWatchedFile(btp.chosenFile.Path, btp.chosenFile.Size, progress > float64(config.Get().PlaybackPercent))
+	SetWatchedFile(btp.chosenFile.Path, btp.chosenFile.Size, btp.IsWatched())
 
-	if progress > float64(config.Get().PlaybackPercent) {
+	if btp.IsWatched() {
+		log.Info("IsWatched")
 		var watched *trakt.WatchedItem
 
 		// TODO: Make use of Playcount, possibly increment when Watched, use old value if in progress
@@ -911,7 +916,7 @@ func (btp *Player) UpdateWatched() {
 
 // IsWatched ...
 func (btp *Player) IsWatched() bool {
-	return (100 * btp.p.WatchedTime / btp.p.VideoDuration) > float64(config.Get().PlaybackPercent)
+	return btp.p.WatchedProgress > float64(config.Get().PlaybackPercent)
 }
 
 func (btp *Player) smartMatch(choices []*CandidateFile) {
