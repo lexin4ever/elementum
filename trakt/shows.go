@@ -497,7 +497,7 @@ func CollectionShows(isUpdateNeeded bool) (shows []*Shows, err error) {
 		return shows, fmt.Errorf("Bad status getting Trakt collection for shows: %d", resp.Status())
 	}
 
-	var collection []*WatchlistShow
+	var collection []*CollectionShow
 	if err := resp.Unmarshal(&collection); err != nil {
 		log.Warning(err)
 	}
