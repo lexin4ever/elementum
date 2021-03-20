@@ -239,6 +239,9 @@ func GetMovies() (movies []*trakt.Movies, err error) {
 // Search for Movie on connected providers
 func getTorrents(m *trakt.Movie, withAuth bool) []*bittorrent.TorrentFile {
 	movie := tmdb.GetMovieByID(strconv.Itoa(m.IDs.TMDB), config.Get().Language)
+	if movie == nil {
+		return nil
+	}
 
 	searchers := providers.GetMovieSearchers()
 	if len(searchers) == 0 {

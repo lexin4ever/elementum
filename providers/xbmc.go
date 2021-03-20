@@ -391,20 +391,36 @@ func (as *AddonSearcher) SearchLinks(query string) []*bittorrent.TorrentFile {
 
 // SearchMovieLinks ...
 func (as *AddonSearcher) SearchMovieLinks(movie *tmdb.Movie) []*bittorrent.TorrentFile {
+	if movie == nil {
+		return []*bittorrent.TorrentFile{}
+	}
+
 	return as.call("search_movie", as.GetMovieSearchObject(movie))
 }
 
 // SearchMovieLinksSilent ...
 func (as *AddonSearcher) SearchMovieLinksSilent(movie *tmdb.Movie, withAuth bool) []*bittorrent.TorrentFile {
+	if movie == nil {
+		return []*bittorrent.TorrentFile{}
+	}
+
 	return as.call("search_movie", as.GetMovieSearchSilentObject(movie, withAuth))
 }
 
 // SearchSeasonLinks ...
 func (as *AddonSearcher) SearchSeasonLinks(show *tmdb.Show, season *tmdb.Season) []*bittorrent.TorrentFile {
+	if show == nil || season == nil {
+		return []*bittorrent.TorrentFile{}
+	}
+
 	return as.call("search_season", as.GetSeasonSearchObject(show, season))
 }
 
 // SearchEpisodeLinks ...
 func (as *AddonSearcher) SearchEpisodeLinks(show *tmdb.Show, episode *tmdb.Episode) []*bittorrent.TorrentFile {
+	if show == nil || episode == nil {
+		return []*bittorrent.TorrentFile{}
+	}
+
 	return as.call("search_episode", as.GetEpisodeSearchObject(show, episode))
 }
