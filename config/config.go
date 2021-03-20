@@ -920,7 +920,7 @@ func CheckBurst() {
 		log.Infof("Triggering Kodi to check for script.elementum.burst plugin")
 		xbmc.InstallAddon("script.elementum.burst")
 
-		for timeout := 0; timeout < 15; timeout++ {
+		for timeout := 0; timeout < 30; timeout++ {
 			if xbmc.IsAddonInstalled("script.elementum.burst") {
 				break
 			}
