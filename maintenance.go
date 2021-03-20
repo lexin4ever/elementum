@@ -195,7 +195,7 @@ func Notification(w http.ResponseWriter, r *http.Request, s *bittorrent.Service)
 			return
 		}
 
-		progress := p.Params().WatchedTime / p.Params().VideoDuration * 100
+		progress := p.Params().WatchedProgress
 
 		log.Infof("Stopped at %f%%", progress)
 
