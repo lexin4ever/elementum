@@ -3,11 +3,13 @@ package api
 import (
 	"net/http"
 	"path/filepath"
+	"strings"
 
 	"github.com/elgatito/elementum/api/repository"
 	"github.com/elgatito/elementum/bittorrent"
 	"github.com/elgatito/elementum/config"
 	"github.com/elgatito/elementum/providers"
+	"github.com/elgatito/elementum/xbmc"
 
 	"github.com/gin-gonic/gin"
 	"github.com/op/go-logging"
@@ -15,11 +17,23 @@ import (
 
 var log = logging.MustGetLogger("api")
 
+// IPLogger records last caller IP to respond to it later (if needed user interaction)
+func IPLogger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		h := c.Request.RemoteAddr
+		if strings.Contains(h, ":") {
+			h = strings.Split(h, ":")[0]
+		}
+		xbmc.LastCallerIP = h
+	}
+}
+
 // Routes ...
 func Routes(s *bittorrent.Service) *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(gin.LoggerWithWriter(gin.DefaultWriter, "/torrents/list", "/notification"))
+	r.Use(IPLogger())
 
 	gin.SetMode(gin.ReleaseMode)
 

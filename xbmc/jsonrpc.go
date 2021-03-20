@@ -26,7 +26,18 @@ var (
 	XBMCExJSONRPCHosts = []string{
 		net.JoinHostPort("127.0.0.1", "65221"),
 	}
+
+	// LastCallerIP represents the IP of last request, made by client to backend.
+	LastCallerIP = ""
 )
+
+func getXBMCExJSONRPCHosts() []string {
+	if LastCallerIP != "" {
+		return []string{net.JoinHostPort(LastCallerIP, "65221")}
+	}
+
+	return XBMCExJSONRPCHosts
+}
 
 func getConnection(hosts ...string) (net.Conn, error) {
 	var err error
@@ -80,7 +91,7 @@ func executeJSONRPCEx(method string, retVal interface{}, args Args) error {
 	if args == nil {
 		args = Args{}
 	}
-	conn, err := getConnection(XBMCExJSONRPCHosts...)
+	conn, err := getConnection(getXBMCExJSONRPCHosts()...)
 	if err != nil {
 		log.Error(err)
 		log.Critical("No available JSON-RPC connection to the add-on")
